@@ -1,0 +1,20 @@
+{
+  "name": "web-tests",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "clean": "rimraf playwright-report test-results",
+    "show-report": "playwright show-report --port=3002",
+    "test:e2e": "start-server-and-test \"(cd ../../apps/web && pnpm start)\" http://localhost:3002 \"playwright test\""
+  },
+  "dependencies": {
+    "start-server-and-test": "^2.0.3",
+    "web": "workspace:*"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.42.1",
+    "@repo/typescript-config": "workspace:*",
+    "rimraf": "^5.0.5"
+  }
+}

@@ -1,0 +1,52 @@
+name: Check code style
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+jobs:
+  run-checks:
+    name: Check code style
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+        if: success()
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.6.0
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.3.0
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - run: echo "📦 Dependencies have been installed."
+        if: success()
+
+      - run: echo "💼 The workflow is now ready to check your code on the runner."
+        if: success()
+
+      - run: echo "🔍 Checking code style..."
+
+      - name: Checking format
+        run: pnpm format
+
+      - name: Run lint
+        run: pnpm lint
+
+      - run: echo "🎉 Code style checks passed!"
+        if: success()

@@ -1,0 +1,91 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "globalDependencies": [".env"],
+  "globalEnv": [
+    "NODE_ENV",
+    "DATABASE_URL",
+    "REDIS_URL",
+    "NEXT_PUBLIC_URL",
+    "NEXT_PUBLIC_DOMAIN",
+    "NEXT_PUBLIC_SCHEME",
+    "NEXT_API_URL",
+    "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "NEXT_PUBLIC_STRIPE_CLIENT_ID",
+    "NEXT_PUBLIC_PLATFORM_SUBSCRIPTION_PERCENT",
+    "NEXT_PUBLIC_PLATFORM_ONETIME_FEE",
+    "NEXT_PUBLIC_PLATFORM_AGENY_PERCENT",
+    "VITE_PUBLIC_URL",
+    "VITE_PUBLIC_DOMAIN",
+    "VITE_PUBLIC_SCHEME",
+    "VITE_API_URL",
+    "API_PORT",
+    "API_SESSION_SECRET",
+    "UPLOADTHING_SECRET",
+    "UPLOADTHING_APP_ID"
+  ],
+  "tasks": {
+    "build": {
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "dependsOn": ["^build", "^generate"],
+      "outputs": [
+        "build/**",
+        ".vercel/**",
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**"
+      ]
+    },
+    "clean": {
+      "cache": false
+    },
+    "db:migrate:deploy": {
+      "cache": false,
+      "interactive": true
+    },
+    "db:migrate:dev": {
+      "cache": false,
+      "interactive": true
+    },
+    "db:push": {
+      "cache": false
+    },
+    "db:seed": {
+      "cache": false
+    },
+    "dev": {
+      "dependsOn": ["^build", "^generate"],
+      "cache": false,
+      "persistent": true
+    },
+    "generate": {
+      "cache": false
+    },
+    "lint": {
+      "dependsOn": ["^build", "^generate"]
+    },
+    "show-report": {},
+    "studio": {},
+    "test": {
+      "dependsOn": ["build", "^generate"]
+    },
+    "test:watch": {
+      "dependsOn": ["build", "^generate"],
+      "interactive": true,
+      "persistent": true
+    },
+    "test:coverage": {
+      "outputs": ["coverage/**"],
+      "dependsOn": ["build", "^generate"]
+    },
+    "test:e2e": {
+      "outputs": ["playwright-report/**", "test-results/**"],
+      "dependsOn": ["build", "^generate"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    }
+  }
+}

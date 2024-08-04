@@ -1,0 +1,24 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "Prisma.prisma",
+    "ms-playwright.playwright",
+    "rangav.vscode-thunder-client",
+    "snyk-security.snyk-vulnerability-scanner",
+    "VisualStudioExptTeam.vscodeintellicode",
+    "VisualStudioExptTeam.vscodeintellicode-completions",
+    "ms-vscode.vscode-typescript-next",
+    "ms-azuretools.vscode-docker",
+    "bradlc.vscode-tailwindcss",
+    "ms-ossdata.vscode-postgresql",
+    "EditorConfig.EditorConfig"
+  ],
+  "unwantedRecommendations": [
+    "aaron-bond.better-comments",
+    "mhutchie.git-graph",
+    "melMass.vscode-mono-workspace",
+    "joshx.workspace-terminals",
+    "PKief.material-icon-theme"
+  ]
+}

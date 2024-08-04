@@ -1,0 +1,193 @@
+name: Testing
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+jobs:
+  test:
+    name: Building and Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
+      NODE_ENV: test
+      HUSKY: 0
+      CI: true
+
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      REDIS_URL: ${{ secrets.REDIS_URL }}
+
+      NEXT_PUBLIC_URL: "http://localhost:3002/"
+      NEXT_PUBLIC_DOMAIN: "localhost:3002"
+      NEXT_PUBLIC_SCHEME: "http://"
+      NEXT_PUBLIC_API_URL: "http://localhost:3000"
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+      NEXT_PUBLIC_STRIPE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_STRIPE_CLIENT_ID }}
+      NEXT_PUBLIC_PLATFORM_SUBSCRIPTION_PERCENT: 1
+      NEXT_PUBLIC_PLATFORM_ONETIME_FEE: 2
+      NEXT_PUBLIC_PLATFORM_AGENY_PERCENT: 1
+
+      VITE_PUBLIC_URL: "http://localhost:3001/"
+      VITE_PUBLIC_DOMAIN: "localhost:3001"
+      VITE_PUBLIC_SCHEME: "http://"
+      VITE_API_URL: "http://localhost:3000"
+
+      API_PORT: 3000
+      API_SESSION_SECRET: ${{ secrets.API_SESSION_SECRET }}
+      UPLOADTHING_SECRET: ${{ secrets.UPLOADTHING_SECRET }}
+      UPLOADTHING_APP_ID: ${{ secrets.UPLOADTHING_APP_ID }}
+
+    steps:
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+
+      - name: Setup .env file
+        run: |
+          echo "NODE_ENV=test" >> .env
+          echo "DATABASE_URL=$DATABASE_URL" >> .env
+          echo "REDIS_URL=$REDIS_URL" >> .env
+          echo "NEXT_PUBLIC_URL=$NEXT_PUBLIC_URL" >> .env
+          echo "NEXT_PUBLIC_DOMAIN=$NEXT_PUBLIC_DOMAIN" >> .env
+          echo "NEXT_PUBLIC_SCHEME=$NEXT_PUBLIC_SCHEME" >> .env
+          echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" >> .env
+          echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=$NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY" >> .env
+          echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY" >> .env
+          echo "STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET" >> .env
+          echo "NEXT_PUBLIC_STRIPE_CLIENT_ID=$NEXT_PUBLIC_STRIPE_CLIENT_ID" >> .env
+          echo "NEXT_PUBLIC_PLATFORM_SUBSCRIPTION_PERCENT=$NEXT_PUBLIC_PLATFORM_SUBSCRIPTION_PERCENT" >> .env
+          echo "NEXT_PUBLIC_PLATFORM_ONETIME_FEE=$NEXT_PUBLIC_PLATFORM_ONETIME_FEE" >> .env
+          echo "NEXT_PUBLIC_PLATFORM_AGENY_PERCENT=$NEXT_PUBLIC_PLATFORM_AGENY_PERCENT" >> .env
+          echo "VITE_PUBLIC_URL=$VITE_PUBLIC_URL" >> .env
+          echo "VITE_PUBLIC_DOMAIN=$VITE_PUBLIC_DOMAIN" >> .env
+          echo "VITE_PUBLIC_SCHEME=$VITE_PUBLIC_SCHEME" >> .env
+          echo "VITE_API_URL=$VITE_API_URL" >> .env
+          echo "API_PORT=$API_PORT" >> .env
+          echo "API_SESSION_SECRET=$API_SESSION_SECRET" >> .env
+          echo "UPLOADTHING_SECRET=$UPLOADTHING_SECRET" >> .env
+          echo "UPLOADTHING_APP_ID=$UPLOADTHING_APP_ID" >> .env
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.6.0
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.3.0
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - run: echo "📦 Dependencies have been installed."
+
+      - run: echo "🧪 The workflow is now ready to test your code on the runner."
+
+      - name: Building the project
+        run: pnpm build
+
+      - run: echo "🔨 The project has been built successfully."
+        if: success()
+
+      - run: echo "🧪 The workflow is now ready to test your code on the runner."
+        if: success()
+
+      - name: 🧪 Testing
+        run: pnpm test:coverage
+        if: success()
+
+      - run: echo "📊 Coverage report has been generated and being uploaded."
+
+      - name: Upload Admin coverage report
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: admin-coverage
+          path: apps/admin/coverage/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload Api coverage report
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: api-coverage
+          path: apps/api/coverage/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload Web coverage report
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: web-coverage
+          path: apps/web/coverage/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload Logger coverage report
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: logger-coverage
+          path: packages/logger/coverage/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload UI coverage report
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: ui-coverage
+          path: packages/ui/coverage/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: E2E test-setup
+        run: |
+          cd packages/web-tests && npx playwright install --with-deps
+          cd ../admin-tests && npx playwright install --with-deps
+
+      - name: 🧪 E2E Testing
+        run: pnpm test:e2e
+        if: success()
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Upload Playwright report for web
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: playwright-report-web
+          path: packages/web-tests/playwright-report/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload Playwright report for admin
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: playwright-report-admin
+          path: packages/admin-tests/playwright-report/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - run: echo "🎉 All tests have passed successfully."
+        if: success()

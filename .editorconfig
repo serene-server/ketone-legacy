@@ -1,0 +1,23 @@
+# http://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = tab
+indent_size = 2
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+indent_style = unset
+indent_size = unset
+
+[**/Dockerfile]
+indent_style = space
+indent_size = 2
+
+[*.{yml,yaml,js,json,sh,nuspec}]
+indent_style = space
+indent_size = 2

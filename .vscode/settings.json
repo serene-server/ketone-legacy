@@ -1,0 +1,14 @@
+{
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
+  "cmake.configureOnOpen": false,
+  "workbench.colorCustomizations": {
+      "statusBar.background": "#00FFFF99",
+      "statusBar.foreground": "#000000FF",
+      "statusBar.debuggingBackground": "#FF000099",
+      "statusBar.debuggingForeground": "#000000FF"
+  }
+}
